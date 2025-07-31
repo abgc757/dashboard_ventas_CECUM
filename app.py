@@ -92,7 +92,7 @@ año_actual = hoy.year
 año_pasado = año_actual - 1
 
 # Título
-st.markdown(f"<h1 style='text-align: center;'>📊 Dashboard de la Campaña de ventas {año_actual}</h1>", 
+st.markdown(f"<h1 style='text-align: center;'>📊 Dashboard Campaña de ventas {año_actual}</h1>", 
             unsafe_allow_html=True)
 
 # Métricas principales
