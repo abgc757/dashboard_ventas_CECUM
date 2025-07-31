@@ -37,7 +37,7 @@ Este proyecto es un dashboard interactivo desarrollado con Streamlit para gestio
 
 1. Clonar el repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/dashboard-inscripciones.git
+   git clone https://github.com/abgc757/dashboard_ventas_CECUM.git
    cd dashboard-inscripciones
    ```
 
