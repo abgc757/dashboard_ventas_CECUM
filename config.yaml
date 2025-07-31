@@ -1,0 +1,28 @@
+credentials:
+  usernames:
+    abraham:
+      email: admin@example.com
+      name: Abraham Gomez
+      password: '$2b$12$VVCEdPqyk/kwqXqBwnpG1eSUpGm/LH/ab1MkcA0xPQU2R0smaYhem'
+      permisos:
+        - agregar_registros
+        - ver_reportes
+        - administrar_usuarios
+    fernanda:
+      email: fer@example.com
+      name: Fernanda Ruiz Velasco Ibarra
+      password: '$2b$12$8Mek8l72MXftrxuIzRMk4Otfk/t2FOLAEC2NvSt1NxjyVwoBHn/qu'
+      permisos:
+        - agregar_registros
+        - ver_reportes
+        - administrar_usuarios
+    ernesto:
+      email: usuario@example.com
+      name: Ernesto Diaz Lopez
+      password: '$2b$12$Yw87q2bC13ENFkwn2k0dEeEJNX8qpGfO4/XCsmvnxU3pMDuRo1XVC'
+      permisos:
+        - ver_reportes
+cookie:
+  name: dashboard_cookie
+  key: your_signature_key_here
+  expiry_days: 30
