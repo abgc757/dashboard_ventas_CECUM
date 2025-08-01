@@ -188,19 +188,32 @@ st.subheader(f"📊 Histórico mensual {año_actual} vs {año_pasado}")
 
 # Crear un DataFrame completo con todos los meses en orden
 nombres_meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-meses_df = pd.DataFrame(index=range(1, 13))  # Usar números de mes como índice
-meses_df.index.name = 'MES'
+meses_df = pd.DataFrame(index=range(1, 13))
 
 # Procesar cada año
 for year in [año_pasado, año_actual]:
-    # Filtrar por año y contar por mes
-    conteo = df[df['ANIO'] == year]['MES'].value_counts().sort_index()
-    
-    # Unir con el DataFrame completo para asegurar todos los meses
-    meses_df = meses_df.join(conteo.rename(year), how='left').fillna(0)
+    try:
+        # Filtrar por año y contar por mes
+        conteo = df[df['ANIO'] == year]['MES'].value_counts().sort_index()
+        
+        # Unir con el DataFrame completo para asegurar todos los meses
+        meses_df = meses_df.join(conteo.rename(year), how='left').fillna(0)
+    except Exception as e:
+        st.warning(f"Error procesando año {year}: {str(e)}")
+        meses_df[year] = 0  # Añadir columna vacía si hay error
 
-# Convertir los números de mes a nombres manteniendo el orden
-meses_df.index = [nombres_meses[i-1] for i in meses_df.index]
+# Convertir los índices a nombres de mes de forma segura
+new_index = []
+for i in meses_df.index:
+    try:
+        if 1 <= i <= 12:
+            new_index.append(nombres_meses[i-1])
+        else:
+            new_index.append(f"Mes {int(i)}")
+    except:
+        new_index.append(f"Inválido: {i}")
+
+meses_df.index = new_index
 
 # Convertir el índice a categoría ordenada para preservar el orden cronológico
 meses_df.index = pd.CategoricalIndex(
@@ -209,7 +222,7 @@ meses_df.index = pd.CategoricalIndex(
     ordered=True
 )
 
-# Ordenar por el índice categórico
+# Ordenar explícitamente por el índice categórico
 meses_df = meses_df.sort_index()
 
 # Mostrar gráfico con los años seleccionados
