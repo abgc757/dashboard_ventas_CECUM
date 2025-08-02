@@ -2,3 +2,5 @@
 venv/
 env/
 .venv/
+accesosDB.json
+datos.csv
