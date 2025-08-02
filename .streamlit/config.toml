@@ -1,0 +1,14 @@
+[server]
+# Reducir la frecuencia de monitoreo
+fileWatcherPollInterval = 5000  # ms
+
+# Desactivar monitoreo de ciertas carpetas
+ignorePaths = [
+    "venv/",
+    ".git/",
+    "__pycache__/",
+    "node_modules/",
+    ".idea/",
+    "data/",
+    "logs/"
+]

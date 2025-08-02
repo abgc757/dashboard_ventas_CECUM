@@ -3,4 +3,6 @@ venv/
 env/
 .venv/
 accesosDB.json
+accesosDB.toml
 datos.csv
+app.py.bak
