@@ -78,7 +78,11 @@ def guardar_datos(df):
         
         # Convertir fechas a formato DD/MM/YYYY antes de guardar
         if not df.empty and "FECHA DE INSCRIPCION" in df.columns:
-            df["FECHA DE INSCRIPCION"] = df["FECHA DE INSCRIPCION"].dt.strftime("%d/%m/%Y")
+            # SOLUCIÓN: Convertir primero a datetime y luego formatear
+            df["FECHA DE INSCRIPCION"] = pd.to_datetime(
+                df["FECHA DE INSCRIPCION"], 
+                errors='coerce'
+            ).dt.strftime("%d/%m/%Y")
         
         # Actualiza toda la hoja con el DataFrame
         worksheet.clear()
@@ -355,11 +359,11 @@ if 'agregar_registros' in st.session_state.get('permisos', []):
                 # Cargar datos actuales desde Google Sheets
                 df_actual = st.session_state.df
                 
-                # Crear nuevo registro (usar fecha directamente como datetime)
+                # Crear nuevo registro - SOLUCIÓN: Usar formato string directamente
                 nuevo_id = df_actual["NO"].max() + 1 if not df_actual.empty and 'NO' in df_actual.columns and pd.notna(df_actual["NO"].max()) else 1
                 nuevo_registro = {
                     "NO": nuevo_id,
-                    "FECHA DE INSCRIPCION": fecha,  # Mantener como objeto de fecha
+                    "FECHA DE INSCRIPCION": fecha.strftime("%d/%m/%Y"),  # Formato string directamente
                     "SEMANA": fecha.isocalendar()[1],
                     "FECHA DE INICIO CICLO ESCOLAR": ciclo,
                     "MODALIDAD": modalidad,
