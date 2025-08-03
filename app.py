@@ -284,7 +284,9 @@ for year in [año_pasado, año_actual]:
         meses_df[year] = 0  # Añadir columna vacía si hay error
     
 # Convertir los índices a nombres de mes
-meses_df.index = [nombres_meses[i-1] if 1 <= i <= 12 else f"Mes {int(i)}" for i in meses_df.index]
+# meses_df.index = [nombres_meses[i-1] if 1 <= i <= 12 else f"Mes {int(i)}" for i in meses_df.index]
+meses_df.index = nombres_meses
+
 
 # Mostrar gráfico con los años seleccionados
 st.bar_chart(meses_df[[año_pasado, año_actual]])
