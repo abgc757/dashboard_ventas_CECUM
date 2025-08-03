@@ -1,10 +1,17 @@
-# .gitignore
+# Entornos virtuales
 venv/
 env/
 .venv/
+
+# Archivos sensibles
 accesosDB.json
 accesosDB.toml
 datos.csv
 app.py.bak
-.streamlit\secrets.toml
-.streamlit\secrets.json
+
+# Configuración de Streamlit
+.streamlit/secrets.toml
+.streamlit/secrets.json
+.streamlit/accesosDB.json
+# Archivos de caché y logs
+__pycache__/

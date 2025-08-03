@@ -38,10 +38,9 @@ def cargar_datos():
         
         # Procesa las fechas
         if not df.empty:
-            df["FECHA DE INSCRIPCION"] = pd.to_datetime(
-                df["FECHA DE INSCRIPCION"], dayfirst=True, errors='coerce'
-            )
-            
+            df["FECHA DE INSCRIPCION"] = pd.to_datetime(df["FECHA DE INSCRIPCION"], dayfirst=True, errors='coerce')
+            if df["FECHA DE INSCRIPCION"].isnull().any():
+                df["FECHA DE INSCRIPCION"] = pd.to_datetime(df["FECHA DE INSCRIPCION"], errors='coerce')
             # Calcula año y mes si no existen
             if 'ANIO' not in df.columns:
                 df["ANIO"] = df["FECHA DE INSCRIPCION"].dt.year
@@ -260,26 +259,27 @@ meses_df = pd.DataFrame(index=range(1, 13))
 for year in [año_pasado, año_actual]:
     try:
         # Filtrar por año y contar por mes
-        conteo = df[df['ANIO'] == year]['MES'].value_counts().sort_index()
+        conteo = df[df['FECHA DE INSCRIPCION'].dt.year == year]['MES'].value_counts().sort_index()
         
         # Unir con el DataFrame completo para asegurar todos los meses
         meses_df = meses_df.join(conteo.rename(year), how='left').fillna(0)
     except Exception as e:
         st.warning(f"Error procesando año {year}: {str(e)}")
         meses_df[year] = 0  # Añadir columna vacía si hay error
-
+    
 # Convertir los índices a nombres de mes de forma segura
-new_index = []
-for i in meses_df.index:
-    try:
-        if 1 <= i <= 12:
-            new_index.append(nombres_meses[i-1])
-        else:
-            new_index.append(f"Mes {int(i)}")
-    except:
-        new_index.append(f"Inválido: {i}")
+# new_index = []
+# for i in meses_df.index:
+#     type(i)
+#     try:
+#         if 1 <= i <= 12:
+#             new_index.append(nombres_meses[i-1])
+#         else:
+#             new_index.append(f"Mes {int(i)}")
+#     except:
+#         new_index.append(f"Inválido: {i}")
 
-meses_df.index = new_index
+meses_df.index = nombres_meses
 
 # Convertir el índice a categoría ordenada para preservar el orden cronológico
 meses_df.index = pd.CategoricalIndex(
