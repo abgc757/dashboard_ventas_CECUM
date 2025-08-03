@@ -37,15 +37,17 @@ def cargar_datos():
         df = df.dropna(how='all')
         
         # Procesa las fechas
-        if not df.empty:
-            df["FECHA DE INSCRIPCION"] = pd.to_datetime(df["FECHA DE INSCRIPCION"], dayfirst=True, errors='coerce')
-            if df["FECHA DE INSCRIPCION"].isnull().any():
-                df["FECHA DE INSCRIPCION"] = pd.to_datetime(df["FECHA DE INSCRIPCION"], errors='coerce')
-            # Calcula año y mes si no existen
-            if 'ANIO' not in df.columns:
-                df["ANIO"] = df["FECHA DE INSCRIPCION"].dt.year
-            if 'MES' not in df.columns:
-                df["MES"] = df["FECHA DE INSCRIPCION"].dt.month
+        if not df.empty and "FECHA DE INSCRIPCION" in df.columns:
+            # Convertir cualquier formato a datetime
+            df["FECHA DE INSCRIPCION"] = pd.to_datetime(
+                df["FECHA DE INSCRIPCION"], 
+                dayfirst=True, 
+                errors='coerce',
+                format='mixed'  # Acepta múltiples formatos
+            )
+            # Calcular año y mes
+            df["ANIO"] = df["FECHA DE INSCRIPCION"].dt.year
+            df["MES"] = df["FECHA DE INSCRIPCION"].dt.month
         
         return df
     
@@ -73,6 +75,10 @@ def guardar_datos(df):
     try:
         spreadsheet = client.open("Datos Inscripciones")
         worksheet = spreadsheet.sheet1
+        
+        # Convertir fechas a formato DD/MM/YYYY antes de guardar
+        if not df.empty and "FECHA DE INSCRIPCION" in df.columns:
+            df["FECHA DE INSCRIPCION"] = df["FECHA DE INSCRIPCION"].dt.strftime("%d/%m/%Y")
         
         # Actualiza toda la hoja con el DataFrame
         worksheet.clear()
@@ -167,7 +173,12 @@ with col1:
     st.metric("Total de inscritos", total_actual)
 
 with col2:
-    inscritos_ayer = len(df[df["FECHA DE INSCRIPCION"].dt.date == ayer])
+    # Asegurar que la fecha sea comparable
+    if not df.empty and "FECHA DE INSCRIPCION" in df.columns:
+        df["FECHA_DATE"] = pd.to_datetime(df["FECHA DE INSCRIPCION"]).dt.date
+        inscritos_ayer = len(df[df["FECHA_DATE"] == ayer])
+    else:
+        inscritos_ayer = 0
     st.metric("Inscritos ayer", inscritos_ayer)
 
 with col3:
@@ -240,7 +251,8 @@ else:
 col1, col2 = st.columns(2)
 with col1:
     st.subheader("👩‍🏫 Inscritos por Asesor")
-    asesor_count = df[df['FECHA DE INSCRIPCION'].dt.year == año_actual]["ASESOR"].value_counts()
+    # Usar columna ANIO para filtrar
+    asesor_count = df[df["ANIO"] == año_actual]["ASESOR"].value_counts()
     st.bar_chart(asesor_count)
 
 with col2:
@@ -259,7 +271,7 @@ meses_df = pd.DataFrame(index=range(1, 13))
 for year in [año_pasado, año_actual]:
     try:
         # Filtrar por año y contar por mes
-        conteo = df[df['FECHA DE INSCRIPCION'].dt.year == year]['MES'].value_counts().sort_index()
+        conteo = df[df['ANIO'] == year]['MES'].value_counts().sort_index()
         
         # Unir con el DataFrame completo para asegurar todos los meses
         meses_df = meses_df.join(conteo.rename(year), how='left').fillna(0)
@@ -267,29 +279,8 @@ for year in [año_pasado, año_actual]:
         st.warning(f"Error procesando año {year}: {str(e)}")
         meses_df[year] = 0  # Añadir columna vacía si hay error
     
-# Convertir los índices a nombres de mes de forma segura
-# new_index = []
-# for i in meses_df.index:
-#     type(i)
-#     try:
-#         if 1 <= i <= 12:
-#             new_index.append(nombres_meses[i-1])
-#         else:
-#             new_index.append(f"Mes {int(i)}")
-#     except:
-#         new_index.append(f"Inválido: {i}")
-
-meses_df.index = nombres_meses
-
-# Convertir el índice a categoría ordenada para preservar el orden cronológico
-meses_df.index = pd.CategoricalIndex(
-    meses_df.index, 
-    categories=nombres_meses,
-    ordered=True
-)
-
-# Ordenar explícitamente por el índice categórico
-meses_df = meses_df.sort_index()
+# Convertir los índices a nombres de mes
+meses_df.index = [nombres_meses[i-1] if 1 <= i <= 12 else f"Mes {int(i)}" for i in meses_df.index]
 
 # Mostrar gráfico con los años seleccionados
 st.bar_chart(meses_df[[año_pasado, año_actual]])
@@ -364,11 +355,11 @@ if 'agregar_registros' in st.session_state.get('permisos', []):
                 # Cargar datos actuales desde Google Sheets
                 df_actual = st.session_state.df
                 
-                # Crear nuevo registro
+                # Crear nuevo registro (usar fecha directamente como datetime)
                 nuevo_id = df_actual["NO"].max() + 1 if not df_actual.empty and 'NO' in df_actual.columns and pd.notna(df_actual["NO"].max()) else 1
                 nuevo_registro = {
                     "NO": nuevo_id,
-                    "FECHA DE INSCRIPCION": fecha.strftime("%d/%m/%Y 00:00"),
+                    "FECHA DE INSCRIPCION": fecha,  # Mantener como objeto de fecha
                     "SEMANA": fecha.isocalendar()[1],
                     "FECHA DE INICIO CICLO ESCOLAR": ciclo,
                     "MODALIDAD": modalidad,
