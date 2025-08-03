@@ -287,6 +287,12 @@ for year in [año_pasado, año_actual]:
 # meses_df.index = [nombres_meses[i-1] if 1 <= i <= 12 else f"Mes {int(i)}" for i in meses_df.index]
 meses_df.index = nombres_meses
 
+meses_df.index = pd.CategoricalIndex(
+    meses_df.index, 
+    categories=nombres_meses,
+    ordered=True
+)
+meses_df = meses_df.sort_index()
 
 # Mostrar gráfico con los años seleccionados
 st.bar_chart(meses_df[[año_pasado, año_actual]])
