@@ -331,10 +331,10 @@ if 'agregar_registros' in st.session_state.get('permisos', []):
 
     ciclos = {
         "ESPECIALIDAD": ["AGOSTO DE 25", "FEBRERO DE 25"],
-        "CEUM": ["SEPTIEMBRE DE 25", "FEBRERO DE 25"],
+        "CEUM": ["SEPTIEMBRE DE 25", "FEBRERO DE 25","SEPTIEMBRE 24", "FEBRERO 24"],
         "MAESTRIA": ["SEPTIEMBRE DE 25", "FEBRERO DE 25"],
-        "BACHILLERATO": ["SEPTIEMBRE DE 25", "FEBRERO DE 25"],
-        "MLK": ["AGOSTO DE 25"]
+        "BACHILLERATO": ["AGOSTO DE 25", "FEBRERO DE 25", "AGOSTO 24"],
+        "MLK": ["AGOSTO DE 25", "SEPTIEMBRE 24"]
     }
 
     nivel = st.selectbox("Nivel académico", list(subniveles.keys()))
